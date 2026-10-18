@@ -1,4 +1,5 @@
 import pytest
+from hypothesis import given, strategies as st
 from customer_lookup import ( 
 customer_exists, 
 build_customer_set, 
@@ -71,4 +72,14 @@ def test_binary_binary_none_raises_type_error():
 def test_binary_unsorted_input_gives_wrong_answer():
     # 101 is in the list, but the list breaks the sorted contract.
     assert customer_exists_binary([303, 202, 101], 101) is False
+    
+@given(st.lists(st.integers()), st.integers())
+def test_all_three_versions_agree(customer_ids, target_id):
+    expected = customer_exists(customer_ids, target_id)
+    
+    customer_set = build_customer_set(customer_ids)
+    assert customer_exists_set(customer_set, target_id) is expected
+    
+    sorted_ids = sorted(customer_ids)
+    assert customer_exists_binary(sorted_ids, target_id) is expected
     
