@@ -1,6 +1,11 @@
 import pytest
-from customer_lookup import customer_exists
-from customer_lookup import customer_exists, build_customer_set, customer_exists_set
+from customer_lookup import ( 
+customer_exists, 
+build_customer_set, 
+customer_exists_set, 
+customer_exists_binary,
+)
+
 
 def test_existing_id_returns_true():
     assert customer_exists([101, 202, 303], 202) is True
@@ -41,3 +46,29 @@ def test_set_duplicates_still_found():
 def test_set_none_raises_type_error():
     with pytest.raises(TypeError):
         build_customer_set(None)
+        
+# Test for binary search function
+SORTED_IDS = (101, 202, 303, 404, 505, 606, 707,)
+
+
+def test_binary_existing_id_returns_true():
+    assert customer_exists_binary(SORTED_IDS, 606) is True
+    
+def test_binary_missing_id_returns_false():
+    assert customer_exists_binary(SORTED_IDS, 808) is False
+    
+def test_binary_first_and_last_items_found():
+    assert customer_exists_binary(SORTED_IDS, 101) is True
+    assert customer_exists_binary(SORTED_IDS, 707) is True
+    
+def test_binary_empty_list_returns_false():
+    assert customer_exists_binary([], 202) is False
+    
+def test_binary_binary_none_raises_type_error():
+    with pytest.raises(TypeError):
+        customer_exists_binary(None, 202)
+        
+def test_binary_unsorted_input_gives_wrong_answer():
+    # 101 is in the list, but the list breaks the sorted contract.
+    assert customer_exists_binary([303, 202, 101], 101) is False
+    
